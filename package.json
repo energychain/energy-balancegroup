@@ -1,0 +1,27 @@
+{
+  "name": "energy-balancegroup",
+  "version": "0.5.1",
+  "description": "Digitial Balance Group Management for Migrogrids (Edge Based)",
+  "main": "lib.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/energychain/energy-balancegroup.git"
+  },
+  "keywords": [
+    "energy",
+    "balancing",
+    "balancegroup",
+    "dso",
+    "microgrid",
+    "p2p"
+  ],
+  "author": "STROMDAO GmbH <dev@stromdao.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/energychain/energy-balancegroup/issues"
+  },
+  "homepage": "https://github.com/energychain/energy-balancegroup#readme"
+}
