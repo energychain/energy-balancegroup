@@ -2,7 +2,7 @@
   "name": "energy-balancegroup",
   "version": "0.5.1",
   "description": "Digitial Balance Group Management for Migrogrids (Edge Based)",
-  "main": "lib.js",
+  "main": "BalanceGroup.class.js",
   "scripts": {
     "test": "mocha"
   },
@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/energychain/energy-balancegroup/issues"
   },
-  "homepage": "https://github.com/energychain/energy-balancegroup#readme"
+  "homepage": "https://github.com/energychain/energy-balancegroup#readme",
+  "devDependencies": {
+    "mocha": "^9.2.2"
+  }
 }

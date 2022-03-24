@@ -11,13 +11,16 @@
 [![Join the chat at https://gitter.im/stromdao/energy-balancegroup](https://badges.gitter.im/stromdao/energy-balancegroup.svg)](https://gitter.im/stromdao/energy-balancegroup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/energychain/energy-balancegroup)
-[![CodePen]((https://img.shields.io/badge/Codepen-000000?style=for-the-badge&logo=codepen&logoColor=white))](https://codepen.io/zoernert/pen/wvPmOvw)
 
 
 ## [CONTRIBUTING](https://github.com/energychain/energy-balancegroup/blob/main/CONTRIBUTING.md)
 
 ## [CODE OF CONDUCT](https://github.com/energychain/energy-balancegroup/blob/main/CODE_OF_CONDUCT.md)
 
+## Notes
+
+- Adding a new feeder works only for the max_consensus index (no later index)
+- Adding a new feeder works via sending a FeedId with addReading
 
 ## Maintainer / Imprint
 
