@@ -2,12 +2,7 @@ var assert = require('assert');
 const BalanceGroup = require("../BalanceGroup.class.js");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-/***
-Test will create two instances A and B
-A will be get random role assigned by B
-A validates if this random role got assigned by B
-****/
-describe('Core', function () {
+describe('Interpolation', function () {
   let idA = Math.random(); // Will become Balance Group ID
   let instanceA = null;  // Will become tesing BalanceGroup
   let feeds = []; // Will hold Test Feeders
