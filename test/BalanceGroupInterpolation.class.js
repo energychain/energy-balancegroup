@@ -7,6 +7,7 @@ describe('Interpolation', function () {
   let instanceA = null;  // Will become tesing BalanceGroup
   let feeds = []; // Will hold Test Feeders
 
+
   describe('#Instance', async function () {
     it('Create Balance Group', async function () {
         assert.throws(() => { new BalanceGroup() },Error,"id expected");
@@ -20,6 +21,11 @@ describe('Interpolation', function () {
             reading:Math.round(Math.random()*1000)
           };
           feeds.push(feed);
+          if(i<3) {
+            instanceA.setFeedMeta(feed.feedId,{type:'upstream'});
+          } else {
+            instanceA.setFeedMeta(feed.feedId,{type:'downstream'});
+          }
           instanceA.addReading(feed.feedId,feed.reading);
         }
     });

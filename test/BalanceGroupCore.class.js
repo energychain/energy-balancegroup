@@ -94,6 +94,21 @@ describe('Core', function () {
         assert.equal(instanceA.getLastConsensusIndex(),5); // Unchanged as we have just partials
         instanceA.interpolateMissing();
     });
+    it('Test restart', async function () {
+        instanceA.reStart();
+        for(let i=0;i<Math.floor(feeds.length/2);i++) {
+          let measurement = (200 * Math.random()) - 100;
+          instanceA.addReading(feeds[i],measurement);
+        }
+        instanceA.close();
+        assert.equal(instanceA.getLastConsensusIndex(),0);
+        for(let i=0;i<feeds.length;i++) {
+          let measurement = (200 * Math.random()) - 100;
+          instanceA.addReading(feeds[i],measurement);
+        }
+        instanceA.close();
+        assert.equal(instanceA.getLastConsensusIndex(),1);
+  });
   });
   //
   //

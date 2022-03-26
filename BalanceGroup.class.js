@@ -3,6 +3,7 @@ const BalanceGroup = class {
       if((typeof id == 'undefined') || (id == null)) { throw new Error("id expected"); }
       this._id = id;
       this._feeds = {};
+      this._feedMeta = {};
       this._positions = {};
       this._opened = new Date().getTime()
       this._closed = false;
@@ -12,6 +13,10 @@ const BalanceGroup = class {
       this._successor = "";
       this.autoReOpen = true;
       this.autoInterpolateOnClose = true;
+    }
+
+    setFeedMeta = function(feedId,meta) {
+      this._feedMeta[feedId] = meta;
     }
 
     addReading = function(feedId,meterReading) {
@@ -25,10 +30,115 @@ const BalanceGroup = class {
         this._feeds[feedId] = {
           balanceId:this._balanceId,
           reading:meterReading,
-          estimation:false
+          estimation:false,
+          meta:this._feedMeta[feedId]
         }
+    }
 
-        //console.log(feedId,meterReading);
+    reStart = function() {
+        let max_consensus = this.getLastConsensusIndex();
+        const consensús_ledger = this._ledger[max_consensus];
+        this._ledger = [];
+        return consensús_ledger;
+    }
+
+    getBalances = function(_upField,_downField,_metaField) {
+      if((typeof _upField == 'undefined') || (_upField == null)) _upField = 'upstream';
+      if((typeof _downField == 'undefined') || (_downField == null)) _downField = 'downstream';
+      if((typeof _metaField == 'undefined') || (_metaField == null)) _metaField = 'type';
+
+      let max_consensus = this.getLastConsensusIndex();
+      this.interpolateMissing();
+      let _balances = [];
+      let _carryOverUp = null;
+      let _carryOverDown = null;
+
+      for(let i=0;i<max_consensus;i++) {
+        let _balance = {
+          time: {
+            start:this._ledger[i].opened,
+            end:this._ledger[i].closed
+          },
+          balanceId:this._ledger[i].balanceId
+        };
+        let _ignored = [];
+        let _upStream = [];
+        let _downStream = [];
+        let _upSum = 0;
+        let _downSum = 0;
+        let _balanceSum = 0;
+        if(_carryOverUp !== null) {
+          _upStream.push({
+            feed:'carryover',
+            value:_carryOverUp
+          });
+        }
+        if(_carryOverDown !== null) {
+          _downStream.push({
+            feed:'carryover',
+            value:_carryOverDown
+          });
+        }
+        for (const [key, value] of Object.entries(this._ledger[i].positions)) {
+          if(typeof this._feedMeta[key] == 'undefined')  {
+            _ignored.push({
+              feed:key,
+              value:value
+            });
+          } else
+          if(this._feedMeta[key][_metaField] == _upField) {
+            _upStream.push({
+              feed:key,
+              value:value
+            });
+            _upSum += 1 * value;
+          } else
+          if(this._feedMeta[key][_metaField] == _downField) {
+            _downStream.push({
+              feed:key,
+              value:value
+            });
+            _downSum += 1 * value;
+          } else {
+            _ignored.push({
+              feed:key,
+              value:value
+            });
+          }
+        }
+        _balance.table = {}
+        if(_upSum > _downSum) {
+          _downStream.push(
+            {
+              feed:'balance',
+              value:_upSum - _downSum
+            }
+          )
+          _balanceSum = _upSum;
+          _carryOverUp = null;
+          _carryOverDown = _upSum - _downSum;
+        }
+        if(_upSum < _downSum) {
+          _upStream.push(
+            {
+              feed:'balance',
+              value:_downSum - _upSum
+            }
+          )
+          _balanceSum = _downSum;
+          _carryOverDown = null;
+          _carryOverUp = _downSum - _upSum;
+        }
+        _balance.table[_upField] = _upStream;
+        _balance.table[_downField] = _downStream;
+        _balance.sum = _balanceSum;
+        _balance.ignored = _ignored;
+        _balance.carryover = {}
+        _balance.carryover[_upField] = _carryOverUp;
+        _balance.carryover[_downField] = _carryOverDown;
+        _balances.push(_balance);
+      }
+      return _balances;
     }
 
     sum = function() {
@@ -99,17 +209,13 @@ const BalanceGroup = class {
                     }
                     if(span > 0) {
                       if(typeof parent._ledger[i-1].positions[key] !== 'undefined') {
-                        let start_reading = parent._ledger[i-1].positions[key].reading;
-                        let end_reading = parent._ledger[i+span].positions[key].reading;
+                        let start_reading = parent._ledger[i-1].positions[key];
+                        let end_reading = parent._ledger[i+span].positions[key];
                         let delta = (end_reading - start_reading)/(span+1);
 
                         for(let j=0;j<=span;j++) {
                           if(typeof parent._ledger[i+j].positions[key] == 'undefined') {
-                            parent._ledger[i+j].positions[key] = {
-                              balanceId:parent._balanceId,
-                              reading:Math.round(start_reading + ((j+1)*delta)),
-                              estimation:true
-                            }
+                            parent._ledger[i+j].positions[key] = Math.round(start_reading + ((j+1)*delta));
                           }
                           interpolated=true;
                         }
@@ -126,6 +232,7 @@ const BalanceGroup = class {
       // while(_interpolateLinear()) {};
 
     }
+
     close = function() {
       this._closing = true;
       let ledgerItem = {
@@ -146,7 +253,7 @@ const BalanceGroup = class {
         if(typeof this._positions[key] == 'undefined') {
           ledgerItem.missing.push(key);
         } else {
-          ledgerItem.positions[key] = value;
+          ledgerItem.positions[key] = this._positions[key];
         }
         ledgerItem.consensus[key] = {
             balanceId:value.balanceId,
@@ -166,6 +273,9 @@ const BalanceGroup = class {
       return ledgerItem;
     }
 
+    toString = function() {
+      return JSON.stringify(this);
+    }
 }
 
 
