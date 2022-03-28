@@ -1,5 +1,8 @@
-const BalanceGroup = class {
+const EventEmitter = require('events');
+
+const BalanceGroup = class extends EventEmitter {
     constructor(id) {
+      super();
       if((typeof id == 'undefined') || (id == null)) { throw new Error("id expected"); }
       this._id = id;
       this._feeds = {};
@@ -11,6 +14,7 @@ const BalanceGroup = class {
       this._balanceId = 'balance_'+id+'_'+this._opened;
       this._ledger = [];
       this._successor = "";
+      this._maxConsensus = 0;
       this.autoReOpen = true;
       this.autoInterpolateOnClose = true;
     }
@@ -23,7 +27,11 @@ const BalanceGroup = class {
         if(isNaN(meterReading)) throw new Error("measurement must be number");
         if((typeof feedId == 'undefined')||(feedId == null)) throw new Error("feedId must be valid identifier");
         if((this._closed)||(this._closing)) throw new Error("balance in closed state");
-
+        if(typeof this._feedMeta[feedId] !== 'undefined') {
+          if(typeof this._feedMeta[feedId].scaleFactor !== 'undefined') {
+            meterReading = meterReading * this._feedMeta[feedId].scaleFactor;
+          }
+        }
         if(typeof this._feeds[feedId] !== 'undefined') {
           this._positions[feedId] = meterReading - this._feeds[feedId].reading;
         }
@@ -39,6 +47,7 @@ const BalanceGroup = class {
         let max_consensus = this.getLastConsensusIndex();
         const consensús_ledger = this._ledger[max_consensus];
         this._ledger = [];
+        this._maxConsensus=0;
         return consensús_ledger;
     }
 
@@ -143,10 +152,29 @@ const BalanceGroup = class {
 
     sum = function() {
       let _sum = 0;
+      let _sums = {};
+
       for (const [key, value] of Object.entries(this._positions)) {
         _sum += value;
       }
       return _sum;
+    }
+
+    sums = function() {
+      let _sum = 0;
+      let _sums = {};
+
+      for (const [key, value] of Object.entries(this._positions)) {
+        if(typeof this._feedMeta[key] !== 'undefined') {
+          if(typeof this._feedMeta[key].type !== 'undefined') {
+            if(typeof _sums[this._feedMeta[key].type] == 'undefined') {
+              _sums[this._feedMeta[key].type] = 0;
+            }
+            _sums[this._feedMeta[key].type] += value;
+          }
+        }
+      }
+      return _sums;
     }
 
     missingPositions = function() {
@@ -179,17 +207,25 @@ const BalanceGroup = class {
 
     getLastConsensusIndex = function() {
       let min_consensus = this._ledger.length;
+      if((typeof this._ledger == 'undefined')||(typeof this._ledger[0] == 'undefined')) {
+        return min_consensus;
+      } else {
+        for (const [key, value] of Object.entries(this._ledger[0].positions)) {
+            let last_position = 0;
+            for(let i=this._ledger.length-1;((i >= 0)&&(last_position == 0));i--) {
+                if(typeof this._ledger[i].positions[key] !== 'undefined') {
+                  last_position = i;
+                }
+            }
+            if(last_position < min_consensus) min_consensus = last_position
+        }
+        if(this._maxConsensus !== min_consensus) {
+          this._maxConsensus = min_consensus;
+          this.emit("Consensus",min_consensus);
+        }
 
-      for (const [key, value] of Object.entries(this._ledger[0].positions)) {
-          let last_position = 0;
-          for(let i=this._ledger.length-1;((i >= 0)&&(last_position == 0));i--) {
-              if(typeof this._ledger[i].positions[key] !== 'undefined') {
-                last_position = i;
-              }
-          }
-          if(last_position < min_consensus) min_consensus = last_position
+        return min_consensus;
       }
-      return min_consensus;
     }
 
     interpolateMissing = function() {
@@ -273,8 +309,21 @@ const BalanceGroup = class {
       return ledgerItem;
     }
 
+    fromString = function(string) {
+        let obj = JSON.parse(string);
+        for (const [key, value] of Object.entries(obj)) {
+          this[key] = value;
+        }
+    }
+
     toString = function() {
-      return JSON.stringify(this);
+      let obj = {}
+      for (const [key, value] of Object.entries(this)) {
+        if(typeof value !== 'function') {
+          obj[key] = value;
+        }
+      }
+      return JSON.stringify(obj);
     }
 }
 

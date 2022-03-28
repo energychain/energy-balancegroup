@@ -1,0 +1,36 @@
+<script type="text/javascript">
+    RED.nodes.registerType('BalanceGroup',{
+        category: 'P2P Network',
+        color: '#dbd26e',
+        defaults: {
+            name: {value:""},
+            address: {value:"",required:true},
+            privateKey: {value:""}
+        },
+        inputs:1,
+        outputs:2,
+        icon: "join.svg",
+        label: function() {
+            return this.name||"BalanceGroup";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="BalanceGroup">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-address"><i class="fa fa-tag"></i> Presentation</label>
+        <input type="text" id="node-input-address" min-length="42" max-length="42" placeholder="(0x....)">
+    </div>
+    <div class="form-tips"><b>Tip:</b> Paste address from <strong>TyDIDS-Sender</strong>.</div>
+</script>
+
+<script type="text/html" data-help-name="BalanceGroup">
+    <p>
+      Creates a DID Receiver. In case an update is received this event will be made available as `output[0]` (payload only) and output[1]` (full DID).
+      Same for `output[2]` and `output[3]` that will return last payload/DID received as soon as triggered by an input.
+    </p>
+</script>
