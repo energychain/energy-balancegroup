@@ -47,10 +47,14 @@ module.exports = function(RED) {
                 };
                 node.send(["balances",ctrlMsg]);
             } else
-            if((typeof msg.payload == 'object')&&(msg.payload !== null) && ((typeof msg.topic == 'undefined')||(msg.topic.length == 0))) {
+            if((typeof msg.payload == 'object')&&(msg.payload !== null)) {
+                let topic_ext = '';
+                if((typeof msg.topic !== 'undefined') && (msg.topic !== null) && (msg.topic.length > 0)) {
+                  topic_ext = msg.topic + "_";
+                }
                 for (const [key, value] of Object.entries(msg.payload)) {
                   if(!isNaN(value)) {
-                    bg.addReading(key,value);
+                    bg.addReading(topic_ext+key,value);
                   }
                 }
             } else
