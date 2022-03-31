@@ -38,6 +38,12 @@ module.exports = function(RED) {
             } else
             if((msg.topic == '_ctrl')&&(msg.payload == 'close')) {
                 bg.close();
+                let balances = bg.getBalances();
+                let ctrlMsg = {
+                  topic:"close",
+                  payload:balances.pop()
+                };
+                node.send(["close",ctrlMsg]);
             } else
             if((msg.topic == '_ctrl')&&(msg.payload == 'balances')) {
                 console.log(bg);
