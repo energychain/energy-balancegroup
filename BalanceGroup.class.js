@@ -57,8 +57,10 @@ const BalanceGroup = class extends EventEmitter {
       if((typeof _metaField == 'undefined') || (_metaField == null)) _metaField = 'type';
 
       let max_consensus = this.getLastConsensusIndex();
-      this.interpolateMissing();
       let _balances = [];
+      if(max_consensus >0) {
+        this.interpolateMissing();
+      }
       let _carryOverUp = null;
       let _carryOverDown = null;
 
@@ -244,7 +246,7 @@ const BalanceGroup = class extends EventEmitter {
                         }
                     }
                     if(span > 0) {
-                      if(typeof parent._ledger[i-1].positions[key] !== 'undefined') {
+                      if((typeof parent._ledger[i-1].positions[key] !== 'undefined')&&(typeof parent._ledger[i+span] !=='undefined')) {
                         let start_reading = parent._ledger[i-1].positions[key];
                         let end_reading = parent._ledger[i+span].positions[key];
                         let delta = (end_reading - start_reading)/(span+1);
