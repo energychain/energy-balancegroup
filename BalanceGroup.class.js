@@ -15,6 +15,7 @@ const BalanceGroup = class extends EventEmitter {
       this._ledger = [];
       this._successor = "";
       this._maxConsensus = 0;
+      this._lastBalance = 0;
       this.autoReOpen = true;
       this.autoInterpolateOnClose = true;
     }
@@ -56,9 +57,14 @@ const BalanceGroup = class extends EventEmitter {
     }
 
     getBalances = function(_upField,_downField,_metaField) {
-      if((typeof _upField == 'undefined') || (_upField == null)) _upField = 'upstream';
-      if((typeof _downField == 'undefined') || (_downField == null)) _downField = 'downstream';
-      if((typeof _metaField == 'undefined') || (_metaField == null)) _metaField = 'type';
+      let _recalc = false;
+      if((typeof _upField == 'undefined') || (_upField == null)) { _upField = 'upstream'; } else { _recalc = true;}
+      if((typeof _downField == 'undefined') || (_downField == null)) { _downField = 'downstream'; } else { _recalc = true; }
+      if((typeof _metaField == 'undefined') || (_metaField == null)) { _metaField = 'type'; } else { _recalc = true; }
+      let _startIndex = this._lastBalance
+      if(_recalc) {
+        _startIndex = 0;
+      }
 
       let max_consensus = this.getLastConsensusIndex();
       let _balances = [];
@@ -67,8 +73,10 @@ const BalanceGroup = class extends EventEmitter {
       }
       let _carryOverUp = null;
       let _carryOverDown = null;
-
-      for(let i=0;i<max_consensus;i++) {
+      let _readingUp = 0;
+      let _readingDown = 0;
+      let _readingSum = 0;
+      for(let i=_startIndex;i<max_consensus;i++) {
         let _balance = {
           time: {
             start:this._ledger[i].opened,
@@ -82,13 +90,17 @@ const BalanceGroup = class extends EventEmitter {
         let _upSum = 0;
         let _downSum = 0;
         let _balanceSum = 0;
+
+
         if(_carryOverUp !== null) {
+          _upSum += _carryOverUp;
           _upStream.push({
             feed:'carryover',
             value:_carryOverUp
           });
         }
         if(_carryOverDown !== null) {
+          _downSum += _carryOverDown;
           _downStream.push({
             feed:'carryover',
             value:_carryOverDown
@@ -121,28 +133,32 @@ const BalanceGroup = class extends EventEmitter {
             });
           }
         }
+
         _balance.table = {}
         if(_upSum > _downSum) {
+          let _balanceSaldo = _upSum - _downSum;
           _downStream.push(
             {
               feed:'balance',
-              value:_upSum - _downSum
+              value:_balanceSaldo
             }
           )
           _balanceSum = _upSum;
           _carryOverUp = null;
           _carryOverDown = _upSum - _downSum;
-        }
-        if(_upSum < _downSum) {
+          _readingUp += _balanceSaldo;
+        } else {
+            let _balanceSaldo = _downSum - _upSum;
           _upStream.push(
             {
               feed:'balance',
-              value:_downSum - _upSum
+              value:_balanceSaldo
             }
           )
           _balanceSum = _downSum;
           _carryOverDown = null;
           _carryOverUp = _downSum - _upSum;
+          _readingDown += _balanceSaldo;
         }
         _balance.table[_upField] = _upStream;
         _balance.table[_downField] = _downStream;
@@ -151,6 +167,12 @@ const BalanceGroup = class extends EventEmitter {
         _balance.carryover = {}
         _balance.carryover[_upField] = _carryOverUp;
         _balance.carryover[_downField] = _carryOverDown;
+        _balance.reading = {};
+
+        _readingSum += _balanceSum;
+        _balance.reading.balance = _readingSum;
+        _balance.reading[_upField] = _readingUp;
+        _balance.reading[_downField] = _readingDown;
         _balances.push(_balance);
       }
       return _balances;

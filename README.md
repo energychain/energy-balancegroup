@@ -2,7 +2,7 @@
 
 <a href="https://stromdao.de/" target="_blank" title="STROMDAO - Digital Energy Infrastructure"><img src="./static/stromdao.png" align="right" height="85px" hspace="30px" vspace="30px"></a>
 
-**Digitial Balance Group Management for migrogrids **
+**Digitial Balance Group Management for migrogrids**
 
 [![npm](https://img.shields.io/npm/dt/energy-balancegroup.svg)](https://www.npmjs.com/package/energy-balancegroup)
 [![npm](https://img.shields.io/npm/v/energy-balancegroup.svg)](https://www.npmjs.com/package/energy-balancegroup)

@@ -1,0 +1,7 @@
+{
+  "cooker":"downstream",
+  "oven":"downstream",
+  "microwave":"downsteam",
+  "dishwasher":"downstream",
+  "kitchenmeter":"upstream"
+}

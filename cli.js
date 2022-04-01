@@ -13,6 +13,8 @@ program
   .option('-r --reading <number>','Set current reading for feed specified with -f')
   .option('-p --showPositions','Displays current balance positions')
   .option('-c --close','Close Balance')
+  .option('--stats','Statistices')
+  .option('--metaFile <file>','Read Meta Information for Feeds from JSON File')
   .option('--showConsensus','Displays all readings');
 
 program.parse();
@@ -35,6 +37,12 @@ if((typeof options.feed !== 'undefined') && (typeof options.feedMeta !== 'undefi
 if((typeof options.feed !== 'undefined') && (typeof options.reading !== 'undefined')) {
   ebg.addReading(options.feed,options.reading * 1);
 }
+if(typeof options.metaFile !== 'undefined') {
+    const meta = fs.readFileSync(options.metaFile);
+    for (const [key, value] of Object.entries(meta)) {
+      ebg.setFeedMeta(key,value);
+    }
+}
 
 if(typeof options.input !== 'undefined') {
   let obj = JSON.parse(fs.readFileSync(options.input));
@@ -56,6 +64,18 @@ if(typeof options.close !== 'undefined') {
 
 if(typeof options.showConsensus !== 'undefined') {
   console.dir(ebg._feeds);
+}
+
+if(typeof options.stats !== 'undefined') {
+  let lastConsensus = ebg.getLastConsensusIndex();
+  if(lastConsensus == 0) {
+    console.log("No balance with consensus (readings for all feeds).");
+  } else {
+    console.log("Last Closed Balance #",lastConsensus);
+    let balances = ebg.getBalances('upstream','downstream','type');
+    console.log(balances);
+  }
+
 }
 
 fs.writeFileSync(options.storage,ebg.toString());
