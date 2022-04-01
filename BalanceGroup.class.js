@@ -33,7 +33,11 @@ const BalanceGroup = class extends EventEmitter {
           }
         }
         if(typeof this._feeds[feedId] !== 'undefined') {
-          this._positions[feedId] = meterReading - this._feeds[feedId].reading;
+          if(typeof this._positions[feedId] == 'undefined') {
+            this._positions[feedId] = meterReading - this._feeds[feedId].reading;
+          } else {
+            this._positions[feedId] += meterReading - this._feeds[feedId].reading;
+          }
         }
         this._feeds[feedId] = {
           balanceId:this._balanceId,
@@ -318,15 +322,21 @@ const BalanceGroup = class extends EventEmitter {
         }
     }
 
-    toString = function() {
+
+    toJSON = function() {
       let obj = {}
       for (const [key, value] of Object.entries(this)) {
         if(typeof value !== 'function') {
           obj[key] = value;
         }
       }
-      return JSON.stringify(obj);
+      return obj;
     }
+
+    toString = function() {
+      return JSON.stringify(this.toJSON());
+    }
+
 }
 
 

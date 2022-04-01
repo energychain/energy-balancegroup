@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# EBG specific default files 
+ebg-storage.json
