@@ -90,8 +90,10 @@ const BalanceGroup = class extends EventEmitter {
         let _upSum = 0;
         let _downSum = 0;
         let _balanceSum = 0;
-
-
+        _balance.consensus = {};
+        for (const [key, value] of Object.entries(this._ledger[i].consensus)) {
+          _balance.consensus[key] = value.reading;
+        }
         if(_carryOverUp !== null) {
           _upSum += _carryOverUp;
           _upStream.push({
@@ -134,7 +136,7 @@ const BalanceGroup = class extends EventEmitter {
           }
         }
 
-        _balance.table = {}
+        _balance.table = {};
         if(_upSum > _downSum) {
           let _balanceSaldo = _upSum - _downSum;
           _downStream.push(
@@ -162,6 +164,13 @@ const BalanceGroup = class extends EventEmitter {
         }
         _balance.table[_upField] = _upStream;
         _balance.table[_downField] = _downStream;
+        _balance.list = {};
+        for(let i=0;i<_balance.table[_upField].length;i++) {
+          _balance.list[_balance.table[_upField][i].feed] = _balance.table[_upField][i].value;
+        }
+        for(let i=0;i<_balance.table[_downField].length;i++) {
+          _balance.list[_balance.table[_downField][i].feed] = _balance.table[_downField][i].value;
+        }
         _balance.sum = _balanceSum;
         _balance.ignored = _ignored;
         _balance.carryover = {}

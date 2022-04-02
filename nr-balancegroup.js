@@ -39,9 +39,11 @@ module.exports = function(RED) {
             if((msg.topic == '_ctrl')&&(msg.payload == 'close')) {
                 bg.close();
                 let balances = bg.getBalances();
+                let lastBalance = balances.pop();
+              
                 let ctrlMsg = {
                   topic:"close",
-                  payload:balances.pop()
+                  payload:lastBalance
                 };
                 node.send(["close",ctrlMsg]);
             } else
