@@ -12,13 +12,13 @@
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/energychain/energy-balancegroup)
 
+## CLI Usage
+```
+npm install -g energy-balancegroup
+energy-balancegroup -h
+```
 
-## [CONTRIBUTING](https://github.com/energychain/energy-balancegroup/blob/main/CONTRIBUTING.md)
-
-## [CODE OF CONDUCT](https://github.com/energychain/energy-balancegroup/blob/main/CODE_OF_CONDUCT.md)
-
-
-## Sample Flow
+## Node-RED - Sample Flow
 
 Metering Concept of a house with 2 parties (Zinh1, Zinh2), a battery storage (Zbat1), a mains meter (Znap) and a PV-Generator (Zeza1).
 
@@ -30,6 +30,10 @@ Metering Concept of a house with 2 parties (Zinh1, Zinh2), a battery storage (Zb
 
 - Adding a new feeder works only for the max_consensus index (no later index)
 - Adding a new feeder works via sending a FeedId with addReading
+
+## [CONTRIBUTING](https://github.com/energychain/energy-balancegroup/blob/main/CONTRIBUTING.md)
+
+## [CODE OF CONDUCT](https://github.com/energychain/energy-balancegroup/blob/main/CODE_OF_CONDUCT.md)
 
 ## Maintainer / Imprint
 
