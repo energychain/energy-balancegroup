@@ -97,7 +97,7 @@ for (const [key, value] of Object.entries(virtualMetersGenerators)) {
 
 // House has Sub-Balances as "Devices"
 ebgHouse.setFeedMeta("Kitchen",{type:"downstream"});
-ebgHouse.setFeedMeta("Living",{type:"downstream"});
+ebgHouse.setFeedMeta("Living",{type:"downstream",label:"Living Room"});
 ebgHouse.setFeedMeta("Generator",{type:"upstream"});
 
 let itteration = 0;
@@ -138,21 +138,27 @@ const runBalanceStep = function() {
   const balances = ebgHouse.getBalances();
 
   if(balances.length>0) {
-    console.log(balances[balances.length-1].reading);
+
     // transponate table
     let rows =0;
     if(balances[balances.length-1].table.upstream.length > rows) rows=balances[balances.length-1].table.upstream.length;
     if(balances[balances.length-1].table.downstream.length > rows) rows=balances[balances.length-1].table.downstream.length;
     let table = [];
+    console.log('\n\r\n\r');
     console.log('Balance from ',new Date(balances[balances.length-1].time.start).toLocaleTimeString(),' until ',new Date(balances[balances.length-1].time.end).toLocaleTimeString());
+    console.log('ID:',balances[balances.length-1].balanceId);
+    console.log('Reading:',balances[balances.length-1].reading);
     for(let i=0;i<rows;i++) {
       let row = {}
       if(i<balances[balances.length-1].table.upstream.length) {
-        row.upstream = balances[balances.length-1].table.upstream[i];
+        row.upstream = {};
+        row.upstream[ebgHouse.getLabel(balances[balances.length-1].table.upstream[i].feed)]=balances[balances.length-1].table.upstream[i].value;
       }
       if(i<balances[balances.length-1].table.downstream.length) {
-        row.downstream = balances[balances.length-1].table.downstream[i];
+        row.downstream = {};
+        row.downstream[ebgHouse.getLabel(balances[balances.length-1].table.downstream[i].feed)]=balances[balances.length-1].table.downstream[i].value;
       }
+
       table.push(row);
     }
     console.table(table);

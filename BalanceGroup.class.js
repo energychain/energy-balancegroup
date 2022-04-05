@@ -7,11 +7,12 @@ const BalanceGroup = class extends EventEmitter {
       this._id = id;
       this._feeds = {};
       this._feedMeta = {};
+      this._labels = {};
       this._positions = {};
       this._opened = new Date().getTime()
       this._closed = false;
       this._closing = false;
-      this._balanceId = 'balance_'+id+'_'+this._opened;
+      this._balanceId = 'eb://'+id+'@'+this._opened;
       this._ledger = [];
       this._successor = "";
       this._maxConsensus = 0;
@@ -22,6 +23,9 @@ const BalanceGroup = class extends EventEmitter {
 
     setFeedMeta = function(feedId,meta) {
       this._feedMeta[feedId] = meta;
+      if(typeof meta.label !== 'undefined') {
+        this._labels[feedId] = meta.label;
+      }
     }
 
     addReading = function(feedId,meterReading) {
@@ -97,14 +101,14 @@ const BalanceGroup = class extends EventEmitter {
         if(_carryOverUp !== null) {
           _upSum += _carryOverUp;
           _upStream.push({
-            feed:'carryover',
+            feed:this._ledger[i].succesorId,
             value:_carryOverUp
           });
         }
         if(_carryOverDown !== null) {
           _downSum += _carryOverDown;
           _downStream.push({
-            feed:'carryover',
+            feed:this._ledger[i].succesorId,
             value:_carryOverDown
           });
         }
@@ -141,7 +145,7 @@ const BalanceGroup = class extends EventEmitter {
           let _balanceSaldo = _upSum - _downSum;
           _downStream.push(
             {
-              feed:'balance',
+              feed:_balance.balanceId,
               value:_balanceSaldo
             }
           )
@@ -153,7 +157,7 @@ const BalanceGroup = class extends EventEmitter {
             let _balanceSaldo = _downSum - _upSum;
           _upStream.push(
             {
-              feed:'balance',
+              feed:_balance.balanceId,
               value:_balanceSaldo
             }
           )
@@ -165,11 +169,27 @@ const BalanceGroup = class extends EventEmitter {
         _balance.table[_upField] = _upStream;
         _balance.table[_downField] = _downStream;
         _balance.list = {};
+        _balance.relatives = {};
+
         for(let i=0;i<_balance.table[_upField].length;i++) {
           _balance.list[_balance.table[_upField][i].feed] = _balance.table[_upField][i].value;
+          _balance.relatives[_balance.table[_upField][i].feed] = {};
+          // Build relative 1:n TODO:BUGGY!
+          for(let j=0;j<_balance.table[_downField].length;j++) {
+            if(_balance.table[_downField][j].feed !== _balance.balanceId) {
+              _balance.relatives[_balance.table[_upField][i].feed][_balance.table[_downField][j].feed] = Math.round( (_balance.table[_downField][j].value/_downSum) * _balance.table[_upField][i].value );
+            }
+          }
         }
         for(let i=0;i<_balance.table[_downField].length;i++) {
           _balance.list[_balance.table[_downField][i].feed] = _balance.table[_downField][i].value;
+          _balance.relatives[_balance.table[_downField][i].feed] = {};
+          // Build relative 1:n
+          for(let j=0;j<_balance.table[_upField].length;j++) {
+            if(_balance.table[_upField][j].feed !== _balance.balanceId) {
+              _balance.relatives[_balance.table[_downField][i].feed][_balance.table[_upField][j].feed] = Math.round( (_balance.table[_upField][j].value/_upSum) * _balance.table[_downField][i].value );
+            }
+          }
         }
         _balance.sum = _balanceSum;
         _balance.ignored = _ignored;
@@ -177,11 +197,23 @@ const BalanceGroup = class extends EventEmitter {
         _balance.carryover[_upField] = _carryOverUp;
         _balance.carryover[_downField] = _carryOverDown;
         _balance.reading = {};
-
         _readingSum += _balanceSum;
         _balance.reading.balance = _readingSum;
         _balance.reading[_upField] = _readingUp;
         _balance.reading[_downField] = _readingDown;
+        _balance.feedClearing = function(_feed,_clearValue) {
+            let _res = {}
+            for (const [key, value] of Object.entries(this.relatives)) {
+              if(key == _feed) {
+                if(this.list[_feed] !== 0) {
+                  for (const [spareKey, spareValue] of Object.entries(value)) {
+                    _res[spareKey] = (spareValue / this.list[_feed]) * _clearValue;
+                  }
+                }
+              }
+            }
+            return _res;
+        }
         _balances.push(_balance);
       }
       return _balances;
@@ -230,16 +262,24 @@ const BalanceGroup = class extends EventEmitter {
       return _p;
     }
 
+    getLabel = function(_feedId) {
+      if(typeof this._labels[_feedId] !== 'undefined') {
+        return this._labels[_feedId];
+      } else {
+        return _feedId;
+      }
+    }
     reOpen = function() {
       if(!this._closed) throw new Error("BalanceGroup not in closed state.");
 
       this._successor = this._balanceId;
       this._positions = {}
       this._positions[this._balanceId] = this.sum();
-      this._balanceId = 'balance_'+this._id+'_'+this._opened;
+      this._balanceId = 'eb://'+this._id+'/'+this._opened;
       this._positions = {};
       this._opened = new Date().getTime();
       this._closed = false;
+      this._labels['eb://'+this._id+'/'+this._opened] = this.getLabel(this._id);
     }
 
     getLastConsensusIndex = function() {

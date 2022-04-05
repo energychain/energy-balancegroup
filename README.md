@@ -18,6 +18,12 @@ npm install -g energy-balancegroup
 energy-balancegroup -h
 ```
 
+## Core Concepts
+Energy-Balance-Group provides a basic data model and schema for energy balancing. Feeds of time series data are taken into a relationship as required for settlements and dispatch recording. The data model takes care of linear interpolation of missing values and keeps track of the latest potential consensus.
+
+The data class provides a replacement of existing physical sensors with a cascade of balances and sub-balances instead of having physical meters/sensors on each level.  
+
+
 ## Node-RED - Sample Flow
 
 Metering Concept of a house with 2 parties (Zinh1, Zinh2), a battery storage (Zbat1), a mains meter (Znap) and a PV-Generator (Zeza1).
