@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Control',{
+        category: 'Energy Balance',
+        color: '#FF9B42',
+        defaults: {
+            name: {value:""},
+            balance: {value:"", type:"Balance",required:true}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "join.svg",
+        label: function() {
+            return this.name ||"Balance Control";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Control">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-balance"><i class="fa fa-tag"></i> Balance</label>
+        <select id="node-input-balance" placeholder="Balance"></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="Control">
+    <p>
+    </p>
+</script>

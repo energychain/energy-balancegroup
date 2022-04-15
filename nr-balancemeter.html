@@ -1,0 +1,40 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Meter',{
+        category: 'Energy Balance',
+        color: '#F7A072',
+        defaults: {
+            name: {value:""},
+            balance: {value:"", type:"Balance",required:true},
+            btype: {value:"cleared",required:true}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "join.svg",
+        label: function() {
+            return this.name||"Balance Meter";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Meter">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-balance"><i class="fa fa-tag"></i> Balance</label>
+        <select id="node-input-balance" placeholder="Balance"></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-btype"><i class="fa fa-tag"></i> Type</label>
+        <select id="node-input-btype" placeholder="Type">
+              <option value="cleared">Cleared (up to last clearing)</option>
+              <option value="settled">Settled (live)</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="Meter">
+    <p>
+    </p>
+</script>

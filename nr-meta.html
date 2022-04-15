@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('MetaData',{
+        category: 'Energy Balance',
+        color: '#D9E5D6',
+        defaults: {
+            name: {value:""},
+            balance: {value:"", type:"Balance",required:true},
+            direction:{value:"upstream",required:true}
+        },
+        inputs:1,
+        icon: "join.svg",
+        label: function() {
+            return this.name||"Balance Meta";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="MetaData">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-balance"><i class="fa fa-tag"></i> Balance</label>
+        <select id="node-input-balance" placeholder="Balance"></select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="MetaData">
+    <p>
+    </p>
+</script>

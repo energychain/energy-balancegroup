@@ -1,0 +1,25 @@
+<script type="text/javascript">
+    RED.nodes.registerType('Balance',{
+        category: 'config',
+        color: '#dbd26e',
+        defaults: {
+            name: {value:""}
+        },
+        icon: "join.svg",
+        label: function() {
+            return this.name||"Balance";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Balance">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="Balance">
+    <p>
+    </p>
+</script>
