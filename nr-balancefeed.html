@@ -8,6 +8,10 @@
             direction:{value:"upstream",required:true}
         },
         inputs:1,
+        outputs:2,
+        outputLabels: [
+        "Power",
+        "Energy"],
         icon: "join.svg",
         label: function() {
             return this.name||"Balance Feed";

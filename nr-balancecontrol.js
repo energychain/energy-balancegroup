@@ -18,9 +18,11 @@ module.exports = function(RED) {
                      key = key.substr(0,key.indexOf('_'));
                    }
                    const _labelNode = RED.nodes.getNode(key);
-                   _labelNode.cleared();
-                   if(typeof _labelNode.name == 'undefined') { _labelNode.name = key; }
-                   payload[dir][_labelNode.name] = value;
+                   if((typeof _labelNode !== 'undefined')&&(_labelNode !== null)) {
+                       _labelNode.cleared();
+                       if(typeof _labelNode.name == 'undefined') { _labelNode.name = key; }
+                       payload[dir][_labelNode.name] = value;
+                   }
               }
           }
           labelDirection('upstream');

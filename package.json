@@ -1,6 +1,6 @@
 {
   "name": "energy-balancegroup",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Digitial Balance Group Management for Migrogrids (Edge Based)",
   "main": "BalanceGroup.class.js",
   "scripts": {
@@ -41,7 +41,8 @@
       "Control": "nr-balancecontrol.js",
       "Feed": "nr-balancefeed.js",
       "Meter": "nr-balancemeter.js",
-      "MetaData": "nr-meta.js"
+      "MetaData": "nr-meta.js",
+      "BalanceView": "nr-balanceview.js"
     }
   },
   "dependencies": {

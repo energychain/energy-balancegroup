@@ -14,7 +14,7 @@ const Balance = class extends EventEmitter {
         upstream: 0,
         downstream: 0
       }
-
+      this._lastBalancing = {};
       this._lastClearing = new Date().getTime();
     }
 
@@ -23,6 +23,10 @@ const Balance = class extends EventEmitter {
           value:value,
           timems:new Date().getTime()
         };
+    }
+
+    lastBalance = function() {
+      return this._lastBalancing;
     }
 
     addReading = function(feedId,upstream_or_downstream,reading,timems) {
@@ -81,7 +85,7 @@ const Balance = class extends EventEmitter {
           from:parent._lastClearing,
           to:_timems
         }
-    };
+      };
 
       const _settlement = {upstream:0,downstream:0};
 
@@ -124,12 +128,10 @@ const Balance = class extends EventEmitter {
       }
       this._previsousClearing = this._lastClearing;
       this._lastClearing = _timems;
-      this._lastBalancing = _balancing;
-      _balancing.reading = {
-        downstream:this._cleared["downstream"],
-        upstream:this._cleared["upstream"],
-        timems:_timems
-      }
+
+      _balancing.reading = this.readingCleared();
+      parent._lastBalancing = _balancing;
+      console.log("Balancing",_balancing);
       return _balancing;
     }
 

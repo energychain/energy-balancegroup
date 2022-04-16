@@ -10,6 +10,7 @@ module.exports = function(RED) {
               try {
               const consensus = balance.addReading(this.id,config.direction,msg.payload);
               node.status({fill:'green',shape:"dot",text:'Power:'+consensus.power+" Energy:"+consensus.value});
+              node.send([{payload:consensus.power},{payload:consensus.value}]);
               } catch(e) {
                   node.status({fill:'red',shape:"dot",text:'Error:'+msg.payload});
               }
@@ -21,7 +22,7 @@ module.exports = function(RED) {
                 try {
                   const consensusUp = balance.addReading(this.id+'_upstream','upstream',msg.payload.upstream);
                   const consensusDown = balance.addReading(this.id+'_downstream','downstream',msg.payload.downstream);
-                  node.status({fill:'green',shape:"dot",text:'Power:'+consensusUp.power+"/"+consensusDown.value});
+                  node.status({fill:'green',shape:"dot",text:'Power:'+consensusUp.power+"/"+consensusUp.power});
                 } catch(e) {
                     node.status({fill:'red',shape:"dot",text:'Error:'+msg.payload});
                 }

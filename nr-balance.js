@@ -31,6 +31,10 @@ module.exports = function(RED) {
           return node.balance.readingSettled();
         }
 
+        this.lastBalance = function() {
+          return node.balance.lastBalance();
+        }
+
         const persist = function() {
           if((dirtyCount > 5) || ((new Date().getTime() - lastPersisted) > 60000)) {
             storage.set(config.id,node.balance.toString());
