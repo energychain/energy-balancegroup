@@ -33,6 +33,7 @@ module.exports = function(RED) {
             payload.timeframe = clearing.timeframe;
             payload.reading = clearing.reading;
             payload.meta = clearing.meta;
+            payload.consensus = clearing.consensus;
             node.send([{payload:payload},{payload:payload.upstream},{payload:payload.downstream},{payload:clearing.meta}]);
         });
 

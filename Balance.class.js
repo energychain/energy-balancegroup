@@ -76,6 +76,7 @@ const Balance = class extends EventEmitter {
     }
 
     clearing = function() {
+      this.carryOver();
       const parent = this;
       const _newConsensus = {
         upstream:{},
@@ -88,6 +89,10 @@ const Balance = class extends EventEmitter {
         timeframe:{
           from:parent._lastClearing,
           to:_timems
+        },
+        consensus:{
+          upstream:{},
+          downstream:{}
         }
       };
 
@@ -101,6 +106,7 @@ const Balance = class extends EventEmitter {
               };
               _balancing[dir][key] = settlement;
               _settlement[dir] += settlement.value;
+              _balancing.consensus[dir][key] = value.reading.value + value.settlement.value;
               _newConsensus[dir][key] = {
                 reading: {
                   value:value.reading.value + value.settlement.value,
@@ -146,7 +152,8 @@ const Balance = class extends EventEmitter {
         }
     }
     carryOver = function() {
-      let reading = this.readingCleared();
+      let reading = this.readingSettled();
+      let res = {};
       try {
         let upstream = 0;
         let downstream = 0;
@@ -156,12 +163,17 @@ const Balance = class extends EventEmitter {
         if(typeof this._feeds.downstream.carryover !== 'undefined') {
           downstream = this._feeds.downstream.carryover.reading.value;
         }
+        res.reading = reading;
         if(reading.upstream > reading.downstream) {
-          this.addReading("carryover","upstream",(reading.upstream-reading.downstream)+upstream);
+          res.ret = this.addReading("carryover","downstream",(reading.upstream-reading.downstream)+downstream);
+          res.upstream = (reading.upstream-reading.downstream);
         } else {
-          this.addReading("carryover","downstream",(reading.downstream-reading.upstream)+downstream);
+          res.ret = this.addReading("carryover","upstream",(reading.downstream-reading.upstream)+upstream);
+          res.downstream = (reading.upstream-reading.downstream);
         }
+        res.reading2 = this.readingSettled();
       } catch(e) {console.log("CarryOver",e);}
+      return res;
     }
     readingSettled = function() {
         const parent = this;
