@@ -147,11 +147,21 @@ const Balance = class extends EventEmitter {
     }
     carryOver = function() {
       let reading = this.readingCleared();
-      if(reading.upstream > reading.downstream) {
-        this.addReading("carryover","upstream",reading.upstream-reading.downstream);
-      } else {
-        this.addReading("carryover","downstream",reading.downstream-reading.upstream);
+      try {
+      let upstream = 0;
+      let downstream = 0;
+      if(typeof this._feeds.upstream.carryover !== 'undefined') {
+        upstream = this._feeds.upstream.carryover.value;
       }
+      if(typeof this._feeds.downstream.carryover !== 'undefined') {
+        downstream = this._feeds.downstream.carryover.value;
+      }
+      if(reading.upstream > reading.downstream) {
+        this.addReading("carryover","upstream",(reading.upstream-reading.downstream)+upstream);
+      } else {
+        this.addReading("carryover","downstream",(reading.downstream-reading.upstream)+downstream);
+      }
+    } catch(e) {}
     }
     readingSettled = function() {
         const parent = this;
