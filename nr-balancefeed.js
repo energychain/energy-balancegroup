@@ -1,4 +1,4 @@
-module.exports = function(RED) {
+  module.exports = function(RED) {
     function EBNode(config) {
         RED.nodes.createNode(this,config);
         const node = this;
@@ -9,10 +9,10 @@ module.exports = function(RED) {
             if(!isNaN(msg.payload)) {
               try {
               const consensus = balance.addReading(this.id,config.direction,msg.payload);
-              node.status({fill:'green',shape:"dot",text:'Power:'+consensus.power+" Energy:"+consensus.value});
+              node.status({fill:'green',shape:"dot",text:"Energy:"+consensus.value});
               node.send([{payload:consensus.power},{payload:consensus.value}]);
               } catch(e) {
-                  node.status({fill:'red',shape:"dot",text:'Error:'+msg.payload});
+                  node.status({fill:'red',shape:"dot",text:'Error:'+msg.payload+" "+e});
               }
             } else {
               if(typeof msg.payload.reading !== 'undefined') {
@@ -22,16 +22,16 @@ module.exports = function(RED) {
                 try {
                   const consensusUp = balance.addReading(this.id+'_upstream','upstream',msg.payload.upstream);
                   const consensusDown = balance.addReading(this.id+'_downstream','downstream',msg.payload.downstream);
-                  node.status({fill:'green',shape:"dot",text:'Power:'+consensusUp.power+"/"+consensusUp.power});
+                  node.status({fill:'green',shape:"dot",text:'Energy:'+consensusUp.value+"/"+consensusUp.value});
                 } catch(e) {
-                    node.status({fill:'red',shape:"dot",text:'Error:'+msg.payload});
+                    node.status({fill:'red',shape:"dot",text:'Error:'+msg.payload+" "+e});
                 }
               }
             }
         });
 
         this.cleared = function() {
-            node.status({fill:'white',shape:"dot",text:''});
+            node.status({fill:'yellow',shape:"dot",text:'no data'});
         }
     }
     RED.nodes.registerType("Feed",EBNode);

@@ -32,6 +32,7 @@ module.exports = function(RED) {
             labelDirection('downstream');
             payload.timeframe = clearing.timeframe;
             payload.reading = clearing.reading;
+            payload.meta = clearing.meta;
             node.send([{payload:payload},{payload:payload.upstream},{payload:payload.downstream},{payload:clearing.meta}]);
         });
 

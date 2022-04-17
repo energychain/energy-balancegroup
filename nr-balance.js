@@ -27,6 +27,9 @@ module.exports = function(RED) {
         this.readingCleared = function() {
           return node.balance.readingCleared();
         }
+        this.carryOver = function() {
+          return node.balance.carryOver();
+        }
         this.readingSettled = function() {
           return node.balance.readingSettled();
         }

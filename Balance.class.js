@@ -51,6 +51,8 @@ const Balance = class extends EventEmitter {
         }
       }
       if(reading < this._feeds[upstream_or_downstream][feedId].reading.value) {
+        this._feeds[upstream_or_downstream][feedId].reading.value = reading;
+        this._feeds[upstream_or_downstream][feedId].reading.timems = timems;
         throw new Error("unexpected reading value");
       }
       if(timems < this._feeds[upstream_or_downstream][feedId].reading.time) {
@@ -62,11 +64,13 @@ const Balance = class extends EventEmitter {
         value:reading - this._feeds[upstream_or_downstream][feedId].reading.value,
         timems:timems - this._feeds[upstream_or_downstream][feedId].reading.timems
       }
-
-      deltaReadingLast.power = Math.round(deltaReadingLast.value / (deltaReadingLast.timems/3600000));
-
+      if(deltaReadingLast.timems !== 0) {
+        deltaReadingLast.power = Math.round(deltaReadingLast.value / (deltaReadingLast.timems/3600000));
+      }
       // Do settlement
       this._feeds[upstream_or_downstream][feedId].settlement.value = deltaReadingLast.value;
+    //  this._feeds[upstream_or_downstream][feedId].reading.value = reading;
+    //  this._feeds[upstream_or_downstream][feedId].reading.timems = timems;
 
       return deltaReadingLast
     }
@@ -131,7 +135,6 @@ const Balance = class extends EventEmitter {
 
       _balancing.reading = this.readingCleared();
       parent._lastBalancing = _balancing;
-      console.log("Balancing",_balancing);
       return _balancing;
     }
 
@@ -141,6 +144,14 @@ const Balance = class extends EventEmitter {
           downstream:this._cleared.downstream,
           timems:this._lastClearing
         }
+    }
+    carryOver = function() {
+      let reading = this.readingCleared();
+      if(reading.upstream > reading.downstream) {
+        this.addReading("carryover","upstream",reading.upstream-reading.downstream);
+      } else {
+        this.addReading("carryover","downstream",reading.downstream-reading.upstream);
+      }
     }
     readingSettled = function() {
         const parent = this;

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('Control',{
+    RED.nodes.registerType('Clearing',{
         category: 'Energy Balance',
         color: '#FF9B42',
         defaults: {
@@ -10,12 +10,12 @@
         outputs:1,
         icon: "join.svg",
         label: function() {
-            return this.name ||"Balance Control";
+            return this.name ||"Balance Clearing";
         }
     });
 </script>
 
-<script type="text/html" data-template-name="Control">
+<script type="text/html" data-template-name="Clearing">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -26,7 +26,11 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="Control">
+<script type="text/html" data-help-name="Clearing">
     <p>
+      <strong>Cleares a balance (closing accounts, feeds) and start with new balance.</strong>
+    </p>
+    <p>
+      A Clearing node might be automatically triggered every 15 minutes by a inject node.
     </p>
 </script>

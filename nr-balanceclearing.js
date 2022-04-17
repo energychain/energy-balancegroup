@@ -34,5 +34,5 @@ module.exports = function(RED) {
         });
 
     }
-    RED.nodes.registerType("Control",EBNode);
+    RED.nodes.registerType("Clearing",EBNode);
 }
