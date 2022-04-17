@@ -148,20 +148,20 @@ const Balance = class extends EventEmitter {
     carryOver = function() {
       let reading = this.readingCleared();
       try {
-      let upstream = 0;
-      let downstream = 0;
-      if(typeof this._feeds.upstream.carryover !== 'undefined') {
-        upstream = this._feeds.upstream.carryover.value;
-      }
-      if(typeof this._feeds.downstream.carryover !== 'undefined') {
-        downstream = this._feeds.downstream.carryover.value;
-      }
-      if(reading.upstream > reading.downstream) {
-        this.addReading("carryover","upstream",(reading.upstream-reading.downstream)+upstream);
-      } else {
-        this.addReading("carryover","downstream",(reading.downstream-reading.upstream)+downstream);
-      }
-    } catch(e) {}
+        let upstream = 0;
+        let downstream = 0;
+        if(typeof this._feeds.upstream.carryover !== 'undefined') {
+          upstream = this._feeds.upstream.carryover.reading.value;
+        }
+        if(typeof this._feeds.downstream.carryover !== 'undefined') {
+          downstream = this._feeds.downstream.carryover.reading.value;
+        }
+        if(reading.upstream > reading.downstream) {
+          this.addReading("carryover","upstream",(reading.upstream-reading.downstream)+upstream);
+        } else {
+          this.addReading("carryover","downstream",(reading.downstream-reading.upstream)+downstream);
+        }
+      } catch(e) {console.log("CarryOver",e);}
     }
     readingSettled = function() {
         const parent = this;
