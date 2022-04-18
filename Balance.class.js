@@ -93,6 +93,10 @@ const Balance = class extends EventEmitter {
         consensus:{
           upstream:{},
           downstream:{}
+        },
+        disaggregation:{
+          upstream:{},
+          downstream:{}
         }
       };
 
@@ -120,9 +124,34 @@ const Balance = class extends EventEmitter {
                   value:value.clearing.value + value.settlement.value,
                   timems:_timems
                 },
+                settled: {
+                  value:value.settlement.value,
+                  timems:_timems
+                },
                 balancing: settlement
               }
           }
+      }
+
+      const disaggregateDirection = function(dir) {
+        let dirOther = 'downstream';
+        if(dir == 'downstream') dirOther = 'upstream';
+
+        let targetDirSum = _settlement[dirOther];
+        let sourceDirSum = _settlement[dir];
+
+        for (const [key, value] of Object.entries(_newConsensus[dir])) {
+          let sourceShare = value.settled.value/sourceDirSum;
+          if(sourceShare > 0) {
+            _balancing.disaggregation[dir][key] = {};
+            for (const [key2, value2] of Object.entries(_newConsensus[dirOther])) {
+               let targetShare = value2.settled.value/targetDirSum;
+               if(targetShare > 0) {
+                  _balancing.disaggregation[dir][key][key2] = value.settled.value * targetShare;
+               }
+            }
+          }
+        }
       }
       clearDirection('upstream');
       this._feeds.upstream = _newConsensus.upstream;
@@ -132,6 +161,9 @@ const Balance = class extends EventEmitter {
       this._feeds.downstream = _newConsensus.downstream;
       this._cleared["downstream"] += _settlement["downstream"];
 
+      disaggregateDirection('upstream');
+      disaggregateDirection('downstream');
+  
       _balancing.meta = {};
       for (const [key, value] of Object.entries(parent._feeds.meta)) {
           _balancing.meta[key] = value;
