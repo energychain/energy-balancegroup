@@ -1,6 +1,6 @@
 {
   "name": "energy-balancegroup",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "Digitial Balance Group Management for Migrogrids (Edge Based)",
   "main": "BalanceGroup.class.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "balancegroup",
     "dso",
     "microgrid",
-    "p2p"
+    "p2p",
+    "node-red"
   ],
   "author": "STROMDAO GmbH <dev@stromdao.com>",
   "license": "Apache-2.0",
