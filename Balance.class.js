@@ -76,7 +76,7 @@ const Balance = class extends EventEmitter {
     }
 
     clearing = function() {
-      this.carryOver();
+      let co = this.carryOver();
       const parent = this;
       const _newConsensus = {
         upstream:{},
@@ -97,7 +97,8 @@ const Balance = class extends EventEmitter {
         disaggregation:{
           upstream:{},
           downstream:{}
-        }
+        },
+        carryover: co
       };
 
       const _settlement = {upstream:0,downstream:0};
@@ -163,7 +164,7 @@ const Balance = class extends EventEmitter {
 
       disaggregateDirection('upstream');
       disaggregateDirection('downstream');
-  
+
       _balancing.meta = {};
       for (const [key, value] of Object.entries(parent._feeds.meta)) {
           _balancing.meta[key] = value;
@@ -185,7 +186,10 @@ const Balance = class extends EventEmitter {
     }
     carryOver = function() {
       let reading = this.readingSettled();
-      let res = {};
+      let res = {
+        upstream:0,
+        downstream:0
+      };
       try {
         let upstream = 0;
         let downstream = 0;

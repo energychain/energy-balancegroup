@@ -1,7 +1,7 @@
 {
   "name": "energy-balancegroup",
-  "version": "0.6.8",
-  "description": "Digitial Balance Group Management for Migrogrids (Edge Based)",
+  "version": "0.6.9",
+  "description": "Digital Balance Group Management for Migrogrids (Edge Based)",
   "main": "BalanceGroup.class.js",
   "scripts": {
     "test": "mocha"
