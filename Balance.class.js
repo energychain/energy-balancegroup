@@ -98,7 +98,10 @@ const Balance = class extends EventEmitter {
           upstream:{},
           downstream:{}
         },
-        carryover: co
+        carryover: {
+          upstream:co.downstream * (-1),
+          downstream:co.upstream * (-1)
+        }
       };
 
       const _settlement = {upstream:0,downstream:0};

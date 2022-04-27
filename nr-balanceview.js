@@ -20,6 +20,7 @@ module.exports = function(RED) {
                 downstream:{},
                 upstream:{}
               },
+              carryover: clearing.carryover,
               meta:{}
             }
             const getLabelNode = function(id) {
